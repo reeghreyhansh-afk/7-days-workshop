@@ -1,0 +1,1 @@
+Place the real company logo in this folder as `company-logo.svg` (or update the `Logo` component in `src/main.tsx`). The current UI uses a clearly labeled placeholder and does not invent a brand mark.
