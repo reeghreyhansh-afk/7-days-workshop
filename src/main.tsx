@@ -124,8 +124,8 @@ function Logo() {
 function Price({ dark = false }: { dark?: boolean }) { return <span className={dark ? 'price price-dark' : 'price'}>₹1,499<span>/-</span></span>; }
 function App() {
   const [flow, setFlow] = useState<Flow>('landing'); const [form, setForm] = useState(initialForm); const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({}); const [menu, setMenu] = useState(false); const [paymentError, setPaymentError] = useState(''); const [paymentBusy, setPaymentBusy] = useState(false);
-  if (window.location.pathname === '/terms') return <PolicyPage kind="terms" onBack={() => { window.history.pushState({}, '', '/'); setFlow('landing'); }} />;
-  if (window.location.pathname === '/privacy') return <PolicyPage kind="privacy" onBack={() => { window.history.pushState({}, '', '/'); setFlow('landing'); }} />;
+  if (window.location.pathname === '/terms') return <PolicyPage kind="terms" onBack={() => window.location.assign('/')} />;
+  if (window.location.pathname === '/privacy') return <PolicyPage kind="privacy" onBack={() => window.location.assign('/')} />;
   const goRegister = () => { setFlow('register'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const update = (key: keyof FormData, value: string | boolean) => { setForm(f => ({ ...f, [key]: value })); setErrors(e => ({ ...e, [key]: '' })); };
   const submit = (event: React.FormEvent) => { event.preventDefault(); const required: (keyof FormData)[] = ['fullName', 'email', 'whatsapp', 'profession', 'city', 'participantType']; const next: typeof errors = {}; required.forEach(key => { if (!form[key]) next[key] = 'Required'; }); if (!form.consent) next.consent = 'Please accept to continue'; setErrors(next); if (!Object.keys(next).length) setFlow('payment'); };
