@@ -201,6 +201,11 @@ h2 span,
   font-family: 'DM Mono', monospace;
 }
 
+.field small,
+.consent-error {
+  color: #d11a2a;
+}
+
 @media(max-width:800px) {
   .image-story {
     padding-left: 7vw;
