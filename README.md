@@ -9,13 +9,22 @@ npm install
 npm run dev
 ```
 
-## Production wiring
+## Cashfree payment setup
 
-The current flow is intentionally frontend-only and labels the payment step as Razorpay test mode. Connect the registration submit to a server endpoint that:
+The payment flow uses Cashfree hosted checkout. The browser submits the registration details to the API, the API creates the Cashfree order, and the success screen is shown only after the API verifies that the order status is `PAID`.
 
-1. Creates a Razorpay order using `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET`.
-2. Stores the registration in Supabase with `payment_status = pending`.
-3. Verifies the Razorpay signature/webhook server-side before changing status to `paid`.
-4. Returns the verified registration id to the success page.
+1. Copy `.env.example` to `.env`.
+2. In the Cashfree Merchant Dashboard, create sandbox API keys and set `CASHFREE_CLIENT_ID` and `CASHFREE_CLIENT_SECRET`.
+3. Run `npm run dev:all`.
+4. Test the registration flow with Cashfree sandbox credentials.
 
-Keep these values server-side: `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `WHATSAPP_GROUP_LINK`. Replace the placeholder logo in `public/brand/` and replace `WHATSAPP_GROUP_LINK` only in the verified success flow. Add real company contact details, Terms, Privacy Policy, and Refund/Cancellation Policy before launch.
+Required before going live:
+
+- Cashfree production App ID and Secret Key.
+- A public HTTPS backend URL for `server/index.mjs`.
+- The frontend URL in `CLIENT_ORIGIN` and whitelisted in Cashfree.
+- Cashfree webhook URL: `https://YOUR-API-DOMAIN/api/cashfree-webhook`.
+- A database (Supabase, PostgreSQL, or similar) to persist registrations and paid status. The current API verifies orders but does not yet persist registrations.
+- Production legal pages, refund policy, contact details, and the final WhatsApp community link.
+
+Never commit `.env` or expose `CASHFREE_CLIENT_SECRET` in frontend code. Cashfree recommends server-side order creation and server-side verification; only an order's `PAID` status should unlock the WhatsApp invitation.
