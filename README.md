@@ -15,10 +15,13 @@ The payment flow uses Cashfree hosted checkout. The browser submits the registra
 
 1. Copy `.env.example` to `.env`.
 2. In the Cashfree Merchant Dashboard, create sandbox API keys and set `CASHFREE_CLIENT_ID` and `CASHFREE_CLIENT_SECRET`.
-3. Create the `registrations` table in Supabase using the SQL below.
-4. Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in `.env`.
-5. Run `npm run dev:all`.
-6. Test the registration flow with Cashfree sandbox credentials.
+3. Set `VITE_CASHFREE_ENV` to the same environment as `CASHFREE_ENV` (`sandbox` for testing or `production` for live payments).
+4. Create the `registrations` table in Supabase using the SQL below.
+5. Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in `.env`.
+6. Run `npm run dev:all`.
+7. Test the registration flow with Cashfree sandbox credentials.
+
+For Vercel, leave `VITE_API_URL` unset so the browser uses same-origin `/api` routes. Add these variables in the Vercel project settings instead of committing them: `CASHFREE_ENV`, `CASHFREE_CLIENT_ID`, `CASHFREE_CLIENT_SECRET`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and `CLIENT_ORIGIN`. Set `VITE_CASHFREE_ENV` to the same Cashfree environment, then redeploy. The Cashfree secret and Supabase service-role key are used only by the Vercel API function.
 
 ```sql
 create table registrations (

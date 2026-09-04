@@ -152,4 +152,8 @@ app.post('/api/cashfree-webhook', async (request, response) => {
   return response.sendStatus(200);
 });
 
-app.listen(port, () => console.log(`Payment API listening on http://localhost:${port}`));
+export default app;
+
+if (process.env.VERCEL !== '1') {
+  app.listen(port, () => console.log(`Payment API listening on http://localhost:${port}`));
+}

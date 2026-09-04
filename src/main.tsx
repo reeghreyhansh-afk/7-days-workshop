@@ -132,14 +132,16 @@ function App() {
   const startPayment = async () => {
     setPaymentBusy(true); setPaymentError('');
     try {
-      const orderResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8787'}/api/create-order`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+      const apiBaseUrl = import.meta.env.VITE_API_URL || '';
+      const orderResponse = await fetch(`${apiBaseUrl}/api/create-order`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
       const order = await orderResponse.json();
       if (!orderResponse.ok) throw new Error(order.error || 'Unable to start payment');
-      const cashfree = await load({ mode: 'sandbox' });
+      const cashfreeMode = import.meta.env.VITE_CASHFREE_ENV === 'production' ? 'production' : 'sandbox';
+      const cashfree = await load({ mode: cashfreeMode });
       if (!cashfree) throw new Error('Cashfree checkout could not load');
       const checkoutResult = await cashfree.checkout({ paymentSessionId: order.paymentSessionId, redirectTarget: '_modal' });
       if (checkoutResult?.error) throw new Error(checkoutResult.error.message || 'Payment was not completed');
-      const verificationResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8787'}/api/verify-order/${order.orderId}`);
+      const verificationResponse = await fetch(`${apiBaseUrl}/api/verify-order/${order.orderId}`);
       const verification = await verificationResponse.json();
       if (!verificationResponse.ok || !verification.paid) throw new Error('Payment is not confirmed yet. Please try again after checking your bank or UPI app.');
       setFlow('success');
