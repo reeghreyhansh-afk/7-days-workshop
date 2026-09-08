@@ -96,7 +96,7 @@ app.post('/api/create-order', async (request, response) => {
       headers: { ...cashfreeHeaders(), 'x-idempotency-key': crypto.randomUUID() },
       body: JSON.stringify({
         order_id: orderId,
-        order_amount: 1499,
+        order_amount: 10,
         order_currency: 'INR',
         customer_details: {
           customer_id: orderId,
