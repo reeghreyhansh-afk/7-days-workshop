@@ -54,12 +54,20 @@ async function saveRegistration(registration) {
 }
 
 async function getRegistration(orderId) {
-  const supabaseResponse = await fetch(`${supabaseUrl}/rest/v1/registrations?select=full_name,email,payment_status,receipt_sent_at&cashfree_order_id=eq.${encodeURIComponent(orderId)}&limit=1`, {
+  const registrationUrl = `${supabaseUrl}/rest/v1/registrations?cashfree_order_id=eq.${encodeURIComponent(orderId)}&limit=1`;
+  const supabaseResponse = await fetch(`${registrationUrl}&select=full_name,email,payment_status,receipt_sent_at`, {
     headers: supabaseHeaders(),
   });
   if (!supabaseResponse.ok) {
-    const data = await supabaseResponse.json().catch(() => ({}));
-    throw new Error(data.message || 'Unable to find registration');
+    const fallbackResponse = await fetch(`${registrationUrl}&select=full_name,email,payment_status`, {
+      headers: supabaseHeaders(),
+    });
+    if (!fallbackResponse.ok) {
+      const data = await fallbackResponse.json().catch(() => ({}));
+      throw new Error(data.message || 'Unable to find registration');
+    }
+    const fallbackRegistrations = await fallbackResponse.json();
+    return fallbackRegistrations[0];
   }
   const registrations = await supabaseResponse.json();
   return registrations[0];
@@ -178,14 +186,31 @@ app.post('/api/create-order', async (request, response) => {
 
 app.get('/api/verify-order/:orderId', async (request, response) => {
   try {
-    const cashfreeResponse = await fetch(`${cashfreeBaseUrl}/orders/${encodeURIComponent(request.params.orderId)}`, {
+    const orderId = request.params.orderId;
+    const cashfreeResponse = await fetch(`${cashfreeBaseUrl}/orders/${encodeURIComponent(orderId)}`, {
       headers: cashfreeHeaders(),
     });
     const data = await cashfreeResponse.json();
     if (!cashfreeResponse.ok) return response.status(cashfreeResponse.status).json({ error: data.message || 'Cashfree order lookup failed' });
-    const paid = data.order_status === 'PAID';
-    if (paid) await markRegistrationPaid(data.order_id);
-    return response.json({ orderId: data.order_id, paid, status: data.order_status });
+    let status = data.order_status;
+    let paid = status === 'PAID';
+    if (!paid) {
+      const paymentsResponse = await fetch(`${cashfreeBaseUrl}/orders/${encodeURIComponent(orderId)}/payments`, {
+        headers: cashfreeHeaders(),
+      });
+      if (paymentsResponse.ok) {
+        const payments = await paymentsResponse.json();
+        paid = Array.isArray(payments) && payments.some(payment => payment.payment_status === 'SUCCESS');
+        if (paid) status = 'PAID';
+      }
+    }
+    if (!paid) {
+      const registration = await getRegistration(orderId);
+      paid = registration?.payment_status === 'paid';
+      if (paid) status = 'PAID';
+    }
+    if (paid) await markRegistrationPaid(data.order_id || orderId);
+    return response.json({ orderId: data.order_id || orderId, paid, status });
   } catch (error) {
     return response.status(500).json({ error: error.message || 'Unable to verify payment' });
   }
