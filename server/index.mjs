@@ -2,6 +2,7 @@ import 'dotenv/config';
 import cors from 'cors';
 import express from 'express';
 import crypto from 'node:crypto';
+import nodemailer from 'nodemailer';
 
 const app = express();
 const port = Number(process.env.PORT || 8787);
@@ -10,6 +11,7 @@ const cashfreeBaseUrl = isProduction ? 'https://api.cashfree.com/pg' : 'https://
 const apiVersion = '2025-01-01';
 const supabaseUrl = process.env.SUPABASE_URL?.replace(/\/$/, '');
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const receiptFrom = process.env.RECEIPT_FROM || 'contact@reeghdesign.com';
 
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173' }));
 app.use('/api/cashfree-webhook', express.raw({ type: 'application/json' }));
@@ -51,15 +53,73 @@ async function saveRegistration(registration) {
   }
 }
 
-async function markRegistrationPaid(orderId) {
-  const supabaseResponse = await fetch(`${supabaseUrl}/rest/v1/registrations?cashfree_order_id=eq.${encodeURIComponent(orderId)}`, {
-    method: 'PATCH',
-    headers: { ...supabaseHeaders(), Prefer: 'return=minimal' },
-    body: JSON.stringify({ payment_status: 'paid', paid_at: new Date().toISOString() }),
+async function getRegistration(orderId) {
+  const supabaseResponse = await fetch(`${supabaseUrl}/rest/v1/registrations?select=full_name,email,payment_status,receipt_sent_at&cashfree_order_id=eq.${encodeURIComponent(orderId)}&limit=1`, {
+    headers: supabaseHeaders(),
   });
   if (!supabaseResponse.ok) {
     const data = await supabaseResponse.json().catch(() => ({}));
-    throw new Error(data.message || 'Unable to update registration');
+    throw new Error(data.message || 'Unable to find registration');
+  }
+  const registrations = await supabaseResponse.json();
+  return registrations[0];
+}
+
+function receiptTransporter() {
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    throw new Error('SMTP receipt email credentials are not configured');
+  }
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT || 587),
+    secure: process.env.SMTP_SECURE === 'true',
+    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+  });
+}
+
+async function sendReceiptEmail(registration, orderId) {
+  await receiptTransporter().sendMail({
+    from: `RéEGH Workshop <${receiptFrom}>`,
+    to: registration.email,
+    subject: 'Payment receipt - RéEGH Generative AI Workshop',
+    text: `Hi ${registration.full_name},\n\nYour payment of ₹10 for the Design in Generative AI & Research in LLM 7-Day Intensive Workshop was successful.\n\nOrder ID: ${orderId}\nPayment status: PAID\n\nThank you,\nRéEGH`,
+    html: `<p>Hi ${registration.full_name},</p><p>Your payment of <strong>₹10</strong> for the <strong>Design in Generative AI &amp; Research in LLM 7-Day Intensive Workshop</strong> was successful.</p><p><strong>Order ID:</strong> ${orderId}<br /><strong>Payment status:</strong> PAID</p><p>Thank you,<br />RéEGH</p>`,
+  });
+}
+
+async function markReceiptSent(orderId) {
+  const supabaseResponse = await fetch(`${supabaseUrl}/rest/v1/registrations?cashfree_order_id=eq.${encodeURIComponent(orderId)}`, {
+    method: 'PATCH',
+    headers: { ...supabaseHeaders(), Prefer: 'return=minimal' },
+    body: JSON.stringify({ receipt_sent_at: new Date().toISOString() }),
+  });
+  if (!supabaseResponse.ok) {
+    const data = await supabaseResponse.json().catch(() => ({}));
+    throw new Error(data.message || 'Unable to mark receipt as sent');
+  }
+}
+
+async function markRegistrationPaid(orderId) {
+  const registration = await getRegistration(orderId);
+  if (!registration) throw new Error('Registration not found for paid order');
+  if (registration.payment_status !== 'paid') {
+    const supabaseResponse = await fetch(`${supabaseUrl}/rest/v1/registrations?cashfree_order_id=eq.${encodeURIComponent(orderId)}`, {
+      method: 'PATCH',
+      headers: { ...supabaseHeaders(), Prefer: 'return=minimal' },
+      body: JSON.stringify({ payment_status: 'paid', paid_at: new Date().toISOString() }),
+    });
+    if (!supabaseResponse.ok) {
+      const data = await supabaseResponse.json().catch(() => ({}));
+      throw new Error(data.message || 'Unable to update registration');
+    }
+  }
+  if (!registration.receipt_sent_at) {
+    try {
+      await sendReceiptEmail(registration, orderId);
+      await markReceiptSent(orderId);
+    } catch (error) {
+      console.error(`Unable to send receipt for order ${orderId}:`, error);
+    }
   }
 }
 
