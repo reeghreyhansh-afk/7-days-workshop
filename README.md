@@ -22,7 +22,7 @@ The payment flow uses Cashfree hosted checkout. The browser submits the registra
 7. Run `npm run dev:all`.
 8. Test the registration flow with Cashfree sandbox credentials.
 
-For Vercel, leave `VITE_API_URL` unset so the browser uses same-origin `/api` routes. Add these variables in the Vercel project settings instead of committing them: `CASHFREE_ENV`, `CASHFREE_CLIENT_ID`, `CASHFREE_CLIENT_SECRET`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `CLIENT_ORIGIN`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, and `RECEIPT_FROM`. Set `VITE_CASHFREE_ENV` to the same Cashfree environment, then redeploy. The Cashfree secret, Supabase service-role key, and SMTP password are used only by the Vercel API function.
+For Vercel, leave `VITE_API_URL` unset so the browser uses same-origin `/api` routes. The production site URL is `https://ai-design-workshop.reeghstudio.com`. Add these variables in the Vercel project settings instead of committing them: `CASHFREE_ENV`, `CASHFREE_CLIENT_ID`, `CASHFREE_CLIENT_SECRET`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `CLIENT_ORIGIN`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, and `RECEIPT_FROM`. Set `CLIENT_ORIGIN=https://ai-design-workshop.reeghstudio.com`, set `VITE_CASHFREE_ENV` to the same Cashfree environment, then redeploy. The Cashfree secret, Supabase service-role key, and SMTP password are used only by the Vercel API function.
 
 ```sql
 create table registrations (
@@ -51,8 +51,8 @@ Required before going live:
 
 - Cashfree production App ID and Secret Key.
 - A public HTTPS backend URL for `server/index.mjs`.
-- The frontend URL in `CLIENT_ORIGIN` and whitelisted in Cashfree.
-- Cashfree webhook URL: `https://YOUR-API-DOMAIN/api/cashfree-webhook`.
+- `CLIENT_ORIGIN=https://ai-design-workshop.reeghstudio.com`, whitelisted in Cashfree.
+- Cashfree webhook URL: `https://ai-design-workshop.reeghstudio.com/api/cashfree-webhook`.
 - A Supabase project with the `registrations` table above.
 - Production legal pages, refund policy, contact details, and the final WhatsApp community link.
 

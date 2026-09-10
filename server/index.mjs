@@ -12,6 +12,8 @@ const apiVersion = '2025-01-01';
 const supabaseUrl = process.env.SUPABASE_URL?.replace(/\/$/, '');
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const receiptFrom = process.env.RECEIPT_FROM || 'contact@reeghdesign.com';
+const workshopBasePrice = 1299;
+const workshopTotalPrice = Number((workshopBasePrice * 1.18).toFixed(2));
 
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173' }));
 app.use('/api/cashfree-webhook', express.raw({ type: 'application/json' }));
@@ -90,8 +92,8 @@ async function sendReceiptEmail(registration, orderId) {
     from: `RéEGH Workshop <${receiptFrom}>`,
     to: registration.email,
     subject: 'Payment receipt - RéEGH Generative AI Workshop',
-    text: `Hi ${registration.full_name},\n\nYour payment of ₹10 for the Design in Generative AI & Research in LLM 7-Day Intensive Workshop was successful.\n\nOrder ID: ${orderId}\nPayment status: PAID\n\nThank you,\nRéEGH`,
-    html: `<p>Hi ${registration.full_name},</p><p>Your payment of <strong>₹10</strong> for the <strong>Design in Generative AI &amp; Research in LLM 7-Day Intensive Workshop</strong> was successful.</p><p><strong>Order ID:</strong> ${orderId}<br /><strong>Payment status:</strong> PAID</p><p>Thank you,<br />RéEGH</p>`,
+    text: `Hi ${registration.full_name},\n\nYour payment of ₹${workshopTotalPrice.toFixed(2)} (₹${workshopBasePrice} + 18% GST) for the Design in Generative AI & Research in LLM 6-Day Intensive Workshop was successful.\n\nOrder ID: ${orderId}\nPayment status: PAID\n\nThank you,\nRéEGH`,
+    html: `<p>Hi ${registration.full_name},</p><p>Your payment of <strong>₹${workshopTotalPrice.toFixed(2)}</strong> (₹${workshopBasePrice} + 18% GST) for the <strong>Design in Generative AI &amp; Research in LLM 6-Day Intensive Workshop</strong> was successful.</p><p><strong>Order ID:</strong> ${orderId}<br /><strong>Payment status:</strong> PAID</p><p>Thank you,<br />RéEGH</p>`,
   });
 }
 
@@ -143,7 +145,7 @@ app.post('/api/create-order', async (request, response) => {
       return response.status(400).json({ error: 'Enter a valid 10-digit WhatsApp number' });
     }
 
-    const orderId = `seven_days_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+    const orderId = `six_days_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
     const returnUrl = process.env.CLIENT_ORIGIN
       ? `${process.env.CLIENT_ORIGIN}/?payment=complete&order_id=${orderId}`
       : undefined;
@@ -164,7 +166,7 @@ app.post('/api/create-order', async (request, response) => {
       headers: { ...cashfreeHeaders(), 'x-idempotency-key': crypto.randomUUID() },
       body: JSON.stringify({
         order_id: orderId,
-        order_amount: 10,
+        order_amount: workshopTotalPrice,
         order_currency: 'INR',
         customer_details: {
           customer_id: orderId,
@@ -173,7 +175,7 @@ app.post('/api/create-order', async (request, response) => {
           customer_phone: customerPhone,
         },
         order_meta: returnUrl ? { return_url: returnUrl } : undefined,
-        order_note: 'Seven-day Generative AI workshop registration',
+        order_note: 'Six-day Generative AI workshop registration: 25 September - 30 September 2026',
       }),
     });
     const data = await cashfreeResponse.json();
