@@ -30,7 +30,7 @@ footer .company-logo {
 }
 
 .footer-brand::before {
-  content: 'RéEGH';
+  content: 'REEGH';
   color: #fff;
   font: 500 24px 'Space Grotesk', sans-serif;
   letter-spacing: 0;
@@ -41,6 +41,10 @@ footer .company-logo {
   font: 10px 'DM Mono', monospace;
   letter-spacing: .1em;
   text-transform: uppercase;
+}
+
+.offer-card .price-dark span {
+  letter-spacing: .14em;
 }
 
 .footer-contact a,

@@ -122,7 +122,7 @@ const workshopBasePrice = 1299;
 const workshopDates = '25 September - 30 September 2026';
 
 function Logo() {
-  return <img className="company-logo" src="/brand/company-logo-transparent.png" alt="RéEGH" />;
+  return <img className="company-logo" src="/brand/company-logo-transparent.png" alt="REEGH" />;
 }
 function Price({ dark = false }: { dark?: boolean }) { return <span className={dark ? 'price price-dark' : 'price'}>₹{workshopBasePrice.toLocaleString('en-IN')}<span> + GST</span></span>; }
 function App() {
