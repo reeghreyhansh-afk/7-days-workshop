@@ -89,11 +89,11 @@ function receiptTransporter() {
 
 async function sendReceiptEmail(registration, orderId) {
   await receiptTransporter().sendMail({
-    from: `REEGH Workshop <${receiptFrom}>`,
+    from: `RÉEGH Workshop <${receiptFrom}>`,
     to: registration.email,
     subject: 'Payment receipt - RéEGH Generative AI Workshop',
-    text: `Hi ${registration.full_name},\n\nYour payment of ₹${workshopTotalPrice.toFixed(2)} (₹${workshopBasePrice} + GST) for the Design in Generative AI & Research in LLM 6-Day Intensive Workshop was successful.\n\nOrder ID: ${orderId}\nPayment status: PAID\n\nThank you,\nREEGH`,
-    html: `<p>Hi ${registration.full_name},</p><p>Your payment of <strong>₹${workshopTotalPrice.toFixed(2)}</strong> (₹${workshopBasePrice} + GST) for the <strong>Design in Generative AI &amp; Research in LLM 6-Day Intensive Workshop</strong> was successful.</p><p><strong>Order ID:</strong> ${orderId}<br /><strong>Payment status:</strong> PAID</p><p>Thank you,<br />REEGH</p>`,
+    text: `Hi ${registration.full_name},\n\nYour payment of ₹${workshopTotalPrice.toFixed(2)} (₹${workshopBasePrice} + GST) for the Design in Generative AI & Research in LLM 6-Day Intensive Workshop was successful.\n\nOrder ID: ${orderId}\nPayment status: PAID\n\nThank you,\nRÉEGH`,
+    html: `<p>Hi ${registration.full_name},</p><p>Your payment of <strong>₹${workshopTotalPrice.toFixed(2)}</strong> (₹${workshopBasePrice} + GST) for the <strong>Design in Generative AI &amp; Research in LLM 6-Day Intensive Workshop</strong> was successful.</p><p><strong>Order ID:</strong> ${orderId}<br /><strong>Payment status:</strong> PAID</p><p>Thank you,<br />RÉEGH</p>`,
   });
 }
 

@@ -15,7 +15,7 @@ const termsSections = [
   ['12. Participant Conduct', 'Participants agree not to harass or threaten others, disrupt sessions, spam communication channels, share inappropriate or unlawful content, attempt unauthorized access, record or distribute content without permission, misuse materials, or impersonate another participant or organizer. Violations may result in removal without refund, where permitted by applicable law.'],
   ['13. Changes to the Workshop', 'The organizers may reasonably modify session timings, curriculum, speakers, workshop format, platforms used, session sequence, or learning resources. Significant changes will be communicated to registered participants.'],
   ['14. Limitation of Liability', 'To the extent permitted by applicable law, the organizers shall not be responsible for indirect, incidental, consequential, or other losses arising from participation or reliance on information provided. The organizers are also not responsible for technical problems caused by a participant\'s internet connection, device, software, or third-party platforms.'],
-  ['15. Contact', 'For questions regarding registration, payment, Workshop access, or these Terms, please contact us using the official contact details provided on the website. Email: contact@reeghdesign.com. WhatsApp/Phone: 8530863658. Company/Organization: REEGH.'],
+  ['15. Contact', 'For questions regarding registration, payment, Workshop access, or these Terms, please contact us using the official contact details provided on the website. Email: contact@reeghdesign.com. WhatsApp/Phone: 8530863658. Company/Organization: RÉEGH.'],
   ['16. Acceptance', 'By registering for the Workshop and completing payment, you confirm that you have read and accepted these Terms & Conditions.'],
 ] as const;
 
@@ -33,7 +33,7 @@ const privacySections = [
   ['11. Children\'s Privacy', 'The Workshop is not specifically directed toward children. We do not knowingly collect personal information from children in violation of applicable law.'],
   ['12. Your Rights', 'Subject to applicable law, you may request access, correction, deletion where legally permitted, withdrawal of consent for certain processing, or information about how your data is used.'],
   ['13. Changes to this Privacy Policy', 'We may update this Privacy Policy to reflect changes in services, technology, legal requirements, or business practices. The updated version will be posted with a revised Last Updated date.'],
-  ['14. Contact Us', 'Company/Organization: REEGH. Email: contact@reeghdesign.com. WhatsApp/Phone: 8530863658. Website: the official Workshop website.'],
+  ['14. Contact Us', 'Company/Organization: RÉEGH. Email: contact@reeghdesign.com. WhatsApp/Phone: 8530863658. Website: the official Workshop website.'],
 ] as const;
 
 export function PolicyPage({ kind, onBack }: { kind: 'terms' | 'privacy'; onBack: () => void }) {
