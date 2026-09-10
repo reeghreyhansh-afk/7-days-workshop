@@ -25,6 +25,17 @@ footer .company-logo {
   margin: 0;
 }
 
+.footer-brand .company-logo {
+  display: none;
+}
+
+.footer-brand::before {
+  content: 'RéEGH';
+  color: #fff;
+  font: 500 24px 'Space Grotesk', sans-serif;
+  letter-spacing: 0;
+}
+
 .footer-label {
   color: #888;
   font: 10px 'DM Mono', monospace;

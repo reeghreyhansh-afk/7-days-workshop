@@ -124,7 +124,7 @@ const workshopDates = '25 September - 30 September 2026';
 function Logo() {
   return <img className="company-logo" src="/brand/company-logo-transparent.png" alt="RéEGH" />;
 }
-function Price({ dark = false }: { dark?: boolean }) { return <span className={dark ? 'price price-dark' : 'price'}>₹{workshopBasePrice.toLocaleString('en-IN')}<span> + 18% GST</span></span>; }
+function Price({ dark = false }: { dark?: boolean }) { return <span className={dark ? 'price price-dark' : 'price'}>₹{workshopBasePrice.toLocaleString('en-IN')}<span> + GST</span></span>; }
 function App() {
   const [flow, setFlow] = useState<Flow>('landing'); const [form, setForm] = useState(initialForm); const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({}); const [menu, setMenu] = useState(false); const [paymentError, setPaymentError] = useState(''); const [paymentBusy, setPaymentBusy] = useState(false);
   if (window.location.pathname === '/terms') return <PolicyPage kind="terms" onBack={() => window.location.assign('/')} />;
