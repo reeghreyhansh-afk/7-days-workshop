@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@cashfreepayments/cashfree-js": "^1.0.7",
+    "@vercel/speed-insights": "^2.0.0",
     "@vitejs/plugin-react": "latest",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
